@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String? @db.VarChar(200)
+
+  dishes      Dish[]
+}
+
+model Dish {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  image       String?
+  price       Float
+  available   Boolean  @default(true)
+
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  orderItems  OrderItem[]
+}
+
+model RestaurantTable {
+  id          Int      @id @default(autoincrement())
+  tableNumber Int      @unique
+  qrCode      String?
+
+  orders      Order[]
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  status    OrderStatus @default(PENDING)
+
+  notes     String?
+  total     Float
+
+  tableId   Int
+  table     RestaurantTable @relation(fields: [tableId], references: [id])
+
+  items     OrderItem[]
+
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id        Int @id @default(autoincrement())
+
+  quantity  Int
+  price     Float
+
+  orderId   Int
+  order     Order @relation(fields: [orderId], references: [id])
+
+  dishId    Int
+  dish      Dish @relation(fields: [dishId], references: [id])
+}
