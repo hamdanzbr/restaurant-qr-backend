@@ -15,11 +15,19 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum AdminRole {
+  ADMIN
+  WAITER
+  CASHIER
+  CHEF
+}
+
 model Admin {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
   password  String
+  role      AdminRole @default(ADMIN)
   createdAt DateTime @default(now())
 }
 
