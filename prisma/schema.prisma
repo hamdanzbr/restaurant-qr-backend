@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum OrderStatus {
@@ -24,7 +25,7 @@ model Admin {
 
 model Category {
   id          Int      @id @default(autoincrement())
-  name        String
+  name        String  @unique
   description String? @db.VarChar(200)
 
   dishes      Dish[]
