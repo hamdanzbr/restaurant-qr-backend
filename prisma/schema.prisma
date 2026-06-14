@@ -64,7 +64,8 @@ model RestaurantTable {
 model Order {
   id        Int         @id @default(autoincrement())
   status    OrderStatus @default(PENDING)
-
+  customerName   String?
+  customerMobile String?
   notes     String?
   total     Float
 

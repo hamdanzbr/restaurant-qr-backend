@@ -1,13 +1,16 @@
 import prisma from "../prisma/prismaClient.js";
-import { createCategoryService, deleteCategoryService, getCategoriesService, getCategoryByIdService, updateCategoryService } from "../services/category.service.js";
+import {
+  createCategoryService,
+  deleteCategoryService,
+  getCategoriesService,
+  getCategoryByIdService,
+  updateCategoryService,
+} from "../services/category.service.js";
+import { getRecentOrdersService } from "../services/dashboard.service.js";
 
-export const getCategories = async (
-  req,
-  res
-) => {
+export const getCategories = async (req, res) => {
   try {
-    const categories =
-      await getCategoriesService();
+    const categories = await getCategoriesService();
 
     res.status(200).json({
       success: true,
@@ -23,18 +26,11 @@ export const getCategories = async (
   }
 };
 
-export const createCategory = async (
-  req,
-  res
-) => {
+export const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
-    const category =
-      await createCategoryService(
-        name,
-        description
-      );
+    const category = await createCategoryService(name, description);
 
     res.status(201).json({
       success: true,
@@ -44,8 +40,7 @@ export const createCategory = async (
     if (error.code === "P2002") {
       return res.status(400).json({
         success: false,
-        message:
-          "Category name already exists",
+        message: "Category name already exists",
       });
     }
 
@@ -56,15 +51,11 @@ export const createCategory = async (
   }
 };
 
-export const getCategoryById = async (
-  req,
-  res
-) => {
+export const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const category =
-      await getCategoryByIdService(id);
+    const category = await getCategoryByIdService(id);
 
     if (!category) {
       return res.status(404).json({
@@ -85,17 +76,13 @@ export const getCategoryById = async (
   }
 };
 
-export const updateCategory = async (
-  req,
-  res
-) => {
+export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
     const { name, description } = req.body;
 
-    const existingCategory =
-      await getCategoryByIdService(id);
+    const existingCategory = await getCategoryByIdService(id);
 
     if (!existingCategory) {
       return res.status(404).json({
@@ -104,12 +91,7 @@ export const updateCategory = async (
       });
     }
 
-    const updatedCategory =
-      await updateCategoryService(
-        id,
-        name,
-        description
-      );
+    const updatedCategory = await updateCategoryService(id, name, description);
 
     res.status(200).json({
       success: true,
@@ -119,8 +101,7 @@ export const updateCategory = async (
     if (error.code === "P2002") {
       return res.status(400).json({
         success: false,
-        message:
-          "Category name already exists",
+        message: "Category name already exists",
       });
     }
 
@@ -131,15 +112,11 @@ export const updateCategory = async (
   }
 };
 
-export const deleteCategory = async (
-  req,
-  res
-) => {
+export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const existingCategory =
-      await getCategoryByIdService(id);
+    const existingCategory = await getCategoryByIdService(id);
 
     if (!existingCategory) {
       return res.status(404).json({
@@ -152,13 +129,30 @@ export const deleteCategory = async (
 
     res.status(200).json({
       success: true,
-      message:
-        "Category deleted successfully",
+      message: "Category deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Something went wrong",
+    });
+  }
+};
+
+export const getRecentOrders = async (req, res) => {
+  try {
+    const data = await getRecentOrdersService();
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch recent orders",
     });
   }
 };
