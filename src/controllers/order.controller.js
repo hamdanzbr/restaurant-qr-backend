@@ -7,7 +7,7 @@ import {
 
 export const createOrder = async (req, res) => {
   try {
-    const { tableId, notes, items } = req.body;
+    const { tableId, notes, items,customerName,customerMobile } = req.body;
 
     // Basic validation
     if (!tableId) {
@@ -28,6 +28,8 @@ export const createOrder = async (req, res) => {
       tableId,
       notes,
       items,
+      customerName,
+      customerMobile
     });
 
     res.status(201).json({

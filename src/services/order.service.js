@@ -4,6 +4,8 @@ export const createOrderService = async ({
   tableId,
   notes,
   items,
+  customerName,
+  customerMobile
 }) => {
   // Get dishes from DB
   const dishes = await prisma.dish.findMany({
@@ -35,7 +37,8 @@ export const createOrderService = async ({
       tableId,
       notes,
       total,
-
+      customerName,
+      customerMobile,
       items: {
         create: items.map((item) => {
           const dish = dishes.find(
