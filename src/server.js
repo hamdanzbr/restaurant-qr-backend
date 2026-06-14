@@ -6,6 +6,8 @@ import tableRoutes from "./routes/table.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js"
+import analyticsRoutes from "./routes/analytics.routes.js"
+
 const app = express();
 
 app.use(cors());
@@ -22,6 +24,9 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/dashboard",dashboardRoutes)
+
+app.use("/api/analytics",analyticsRoutes)
+
 app.get("/", (req, res) => {
   res.json({
     message: "Restaurant API Running",
