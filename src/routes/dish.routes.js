@@ -8,10 +8,12 @@ import {
   updateDish,
 } from "../controllers/dish.controller.js";
 import { authorize } from "../middleware/role.middleware.js";
+import { createDishSchema } from "../validators/dish.validator.js";
+import { validate } from "../middleware/validate.middleware.js";
 
 const router = express.Router();
 
-router.post("/",authorize("ADMIN","CHEF"), createDish);
+router.post("/",authorize("ADMIN","CHEF"),validate(createDishSchema), createDish);
 
 router.get("/", getDishes);
 
