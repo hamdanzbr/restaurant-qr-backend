@@ -1,52 +1,34 @@
 import {
-    getAnalyticsChartsService,
+  getAnalyticsChartsService,
   getAnalyticsOverviewService,
 } from "../services/analytics.service.js";
 
+import asyncHandler from "../utils/asyncHandler.js";
+
 export const getAnalyticsOverview =
-  async (req, res) => {
-    try {
-      const data =
-        await getAnalyticsOverviewService();
+  asyncHandler(async (req, res) => {
+    const data =
+      await getAnalyticsOverviewService();
 
-      res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log(error);
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });
 
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch analytics",
-      });
-    }
-  };
+export const getAnalyticsCharts =
+  asyncHandler(async (req, res) => {
+    const {
+      period = "week",
+    } = req.query;
 
-  export const getAnalyticsCharts =
-  async (req, res) => {
-    try {
-      const {
-        period = "week",
-      } = req.query;
+    const data =
+      await getAnalyticsChartsService(
+        period
+      );
 
-      const data =
-        await getAnalyticsChartsService(
-          period
-        );
-
-      res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch analytics charts",
-      });
-    }
-  };
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });

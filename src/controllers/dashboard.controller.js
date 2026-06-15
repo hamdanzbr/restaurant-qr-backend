@@ -5,91 +5,53 @@ import {
   getRevenueChartService,
 } from "../services/dashboard.service.js";
 
+import asyncHandler from "../utils/asyncHandler.js";
+
 export const getDashboardSummary =
-  async (req, res) => {
-    try {
-      const data =
-        await getDashboardSummaryService();
+  asyncHandler(async (req, res) => {
+    const data =
+      await getDashboardSummaryService();
 
-      res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log(error);
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });
 
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch dashboard summary",
-      });
-    }
-  };
+export const getRevenueChart =
+  asyncHandler(async (req, res) => {
+    const { period = "week" } =
+      req.query;
 
-  export const getRevenueChart =
-  async (req, res) => {
-    try {
-      const { period = "week" } =
-        req.query;
+    const data =
+      await getRevenueChartService(
+        period
+      );
 
-      const data =
-        await getRevenueChartService(
-          period
-        );
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });
 
-      res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log(error);
+export const getOrdersOverview =
+  asyncHandler(async (req, res) => {
+    const data =
+      await getOrdersOverviewService();
 
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch revenue chart",
-      });
-    }
-  };
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });
 
-  export const getOrdersOverview =
-  async (req, res) => {
-    try {
-      const data =
-        await getOrdersOverviewService();
+export const getPopularDishes =
+  asyncHandler(async (req, res) => {
+    const data =
+      await getPopularDishesService();
 
-      res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch orders overview",
-      });
-    }
-  };
-
-  export const getPopularDishes =
-  async (req, res) => {
-    try {
-      const data =
-        await getPopularDishesService();
-
-      res.status(200).json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({
-        success: false,
-        message:
-          "Failed to fetch popular dishes",
-      });
-    }
-  };
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });

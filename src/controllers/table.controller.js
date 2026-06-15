@@ -6,11 +6,11 @@ import {
   deleteTableService,
 } from "../services/table.service.js";
 
-export const createTable = async (
-  req,
-  res
-) => {
-  try {
+import asyncHandler from "../utils/asyncHandler.js";
+import ApiError from "../utils/ApiError.js";
+
+export const createTable =
+  asyncHandler(async (req, res) => {
     const { tableNumber } = req.body;
 
     const table =
@@ -22,27 +22,10 @@ export const createTable = async (
       success: true,
       data: table,
     });
-  } catch (error) {
-    if (error.code === "P2002") {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Table number already exists",
-      });
-    }
+  });
 
-    res.status(500).json({
-      success: false,
-      message: "Failed to create table",
-    });
-  }
-};
-
-export const getTables = async (
-  req,
-  res
-) => {
-  try {
+export const getTables =
+  asyncHandler(async (req, res) => {
     const tables =
       await getTablesService();
 
@@ -50,58 +33,40 @@ export const getTables = async (
       success: true,
       data: tables,
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch tables",
-    });
-  }
-};
+  });
 
-export const getTableById = async (
-  req,
-  res
-) => {
-  try {
+export const getTableById =
+  asyncHandler(async (req, res) => {
     const table =
       await getTableByIdService(
         req.params.id
       );
 
     if (!table) {
-      return res.status(404).json({
-        success: false,
-        message: "Table not found",
-      });
+      throw new ApiError(
+        404,
+        "Table not found"
+      );
     }
 
     res.status(200).json({
       success: true,
       data: table,
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch table",
-    });
-  }
-};
+  });
 
-export const updateTable = async (
-  req,
-  res
-) => {
-  try {
+export const updateTable =
+  asyncHandler(async (req, res) => {
     const table =
       await getTableByIdService(
         req.params.id
       );
 
     if (!table) {
-      return res.status(404).json({
-        success: false,
-        message: "Table not found",
-      });
+      throw new ApiError(
+        404,
+        "Table not found"
+      );
     }
 
     const updatedTable =
@@ -114,29 +79,20 @@ export const updateTable = async (
       success: true,
       data: updatedTable,
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update table",
-    });
-  }
-};
+  });
 
-export const deleteTable = async (
-  req,
-  res
-) => {
-  try {
+export const deleteTable =
+  asyncHandler(async (req, res) => {
     const table =
       await getTableByIdService(
         req.params.id
       );
 
     if (!table) {
-      return res.status(404).json({
-        success: false,
-        message: "Table not found",
-      });
+      throw new ApiError(
+        404,
+        "Table not found"
+      );
     }
 
     await deleteTableService(
@@ -148,10 +104,4 @@ export const deleteTable = async (
       message:
         "Table deleted successfully",
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete table",
-    });
-  }
-};
+  });
