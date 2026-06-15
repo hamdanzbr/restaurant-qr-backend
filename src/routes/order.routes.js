@@ -11,15 +11,12 @@ import { createOrderSchema } from "../validators/order.validator.js";
 
 const router = express.Router();
 
-router.post("/",validate(createOrderSchema), createOrder);
+router.post("/", validate(createOrderSchema), createOrder);
 
 router.get("/", getOrders);
 
 router.get("/:id", getOrderById);
 
-router.patch(
-  "/:id/status",
-  updateOrderStatus
-);
+router.patch("/:id/status", updateOrderStatus);
 
 export default router;
