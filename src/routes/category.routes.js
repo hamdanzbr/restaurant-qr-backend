@@ -9,16 +9,28 @@ import { deleteCategory } from "../controllers/category.controller.js";
 import { authorize } from "../middleware/role.middleware.js";
 import { createCategorySchema } from "../validators/category.validator.js";
 import { validate } from "../middleware/validate.middleware.js";
+import { getCategoryStats } from "../controllers/category.controller.js";
 
 const router = express.Router();
 
 router.get("/", getCategories);
 
-router.post("/", authorize("ADMIN"),validate(createCategorySchema), createCategory);
+router.get("/stats", getCategoryStats);
+
+router.post(
+  "/",
+  // authorize("ADMIN"),
+  validate(createCategorySchema),
+  createCategory,
+);
 
 router.get("/:id", getCategoryById);
 
-router.put("/:id",authorize("ADMIN"), updateCategory);
+router.put("/:id", 
+  // authorize("ADMIN"),
+   updateCategory);
 
-router.delete("/:id",authorize("ADMIN"), deleteCategory);
+router.delete("/:id",
+  //  authorize("ADMIN"),
+    deleteCategory);
 export default router;

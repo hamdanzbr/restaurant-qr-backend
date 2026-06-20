@@ -5,6 +5,7 @@ import {
   getOrders,
   getOrderById,
   updateOrderStatus,
+  getOrderStats,
 } from "../controllers/order.controller.js";
 import { validate } from "../middleware/validate.middleware.js";
 import { createOrderSchema } from "../validators/order.validator.js";
@@ -14,6 +15,8 @@ const router = express.Router();
 router.post("/", validate(createOrderSchema), createOrder);
 
 router.get("/", getOrders);
+
+router.get("/stats", getOrderStats);
 
 router.get("/:id", getOrderById);
 

@@ -33,14 +33,19 @@ export const createDish = asyncHandler(async (req, res) => {
   });
 });
 
-export const getDishes = asyncHandler(async (req, res) => {
-  const dishes = await getDishesService();
+export const getDishes = asyncHandler(
+  async (req, res) => {
+    const data =
+      await getDishesService(
+        req.query
+      );
 
-  res.status(200).json({
-    success: true,
-    data: dishes,
-  });
-});
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  }
+);
 
 export const getDishById = asyncHandler(async (req, res) => {
   const { id } = req.params;

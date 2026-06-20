@@ -13,13 +13,13 @@ import { validate } from "../middleware/validate.middleware.js";
 
 const router = express.Router();
 
-router.post("/",authorize("ADMIN","CHEF"),validate(createDishSchema), createDish);
+router.post("/",validate(createDishSchema), createDish);
 
 router.get("/", getDishes);
 
 router.get("/:id", getDishById);
 
-router.put("/:id",authorize("ADMIN","CHEF"), updateDish);
+router.put("/:id", updateDish);
 
-router.delete("/:id",authorize("ADMIN","CHEF"), deleteDish);
+router.delete("/:id", deleteDish);
 export default router;

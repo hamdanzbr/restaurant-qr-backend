@@ -3,6 +3,7 @@ import {
   getOrdersService,
   getOrderByIdService,
   updateOrderStatusService,
+  getOrderStatsService,
 } from "../services/order.service.js";
 import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -55,3 +56,14 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     data: order,
   });
 });
+
+export const getOrderStats =
+  asyncHandler(async (req, res) => {
+    const data =
+      await getOrderStatsService();
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });

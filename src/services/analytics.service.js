@@ -15,6 +15,7 @@ export const getAnalyticsOverviewService = async () => {
     },
   });
 
+  // Peak ordering hours
   const orders = await prisma.order.findMany({
     select: {
       createdAt: true,
@@ -29,18 +30,12 @@ export const getAnalyticsOverviewService = async () => {
     hourMap[hour] = (hourMap[hour] || 0) + 1;
   });
 
-  let peakHour = null;
-  let maxOrders = 0;
+  const peakOrderingHours = Object.entries(hourMap)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([hour]) => `${hour}:00-${Number(hour) + 1}:00`);
 
-  for (const hour in hourMap) {
-    if (hourMap[hour] > maxOrders) {
-      maxOrders = hourMap[hour];
-      peakHour = Number(hour);
-    }
-  }
-
-  const peakOrderingHour = peakHour !== null ? `${peakHour}:00` : "N/A";
-
+  // Top selling dishes
   const orderItems = await prisma.orderItem.findMany({
     include: {
       dish: true,
@@ -70,6 +65,7 @@ export const getAnalyticsOverviewService = async () => {
     .sort((a, b) => b.quantitySold - a.quantitySold)
     .slice(0, 5);
 
+  // Popular categories
   const categoryItems = await prisma.orderItem.findMany({
     include: {
       dish: {
@@ -89,12 +85,12 @@ export const getAnalyticsOverviewService = async () => {
       categoriesMap[category.id] = {
         id: category.id,
         name: category.name,
-        orders: 0,
+        itemsSold: 0,
         revenue: 0,
       };
     }
 
-    categoriesMap[category.id].orders += item.quantity;
+    categoriesMap[category.id].itemsSold += item.quantity;
 
     categoriesMap[category.id].revenue += item.quantity * item.price;
   });
@@ -111,7 +107,7 @@ export const getAnalyticsOverviewService = async () => {
 
       averageOrderValue: Number((averageOrderValue._avg.total || 0).toFixed(2)),
 
-      peakOrderingHour,
+      peakOrderingHours,
     },
 
     popularCategories,
@@ -120,100 +116,78 @@ export const getAnalyticsOverviewService = async () => {
   };
 };
 
-export const getAnalyticsChartsService =
-  async (period = "week") => {
-    const today = new Date();
+export const getAnalyticsChartsService = async (period = "week") => {
+  const today = new Date();
 
-    let days = 7;
+  let days = 7;
 
-    if (period === "month") {
-      days = 30;
-    }
+  if (period === "month") {
+    days = 30;
+  }
 
-    if (period === "year") {
-      days = 365;
-    }
+  if (period === "year") {
+    days = 365;
+  }
 
-    const startDate = new Date();
+  const startDate = new Date();
 
-    startDate.setDate(
-      today.getDate() - (days - 1)
-    );
+  startDate.setDate(today.getDate() - (days - 1));
 
-    const orders =
-      await prisma.order.findMany({
-        where: {
-          createdAt: {
-            gte: startDate,
-          },
-        },
-        select: {
-          total: true,
-          createdAt: true,
-        },
-      });
+  const orders = await prisma.order.findMany({
+    where: {
+      createdAt: {
+        gte: startDate,
+      },
+    },
+    select: {
+      total: true,
+      createdAt: true,
+    },
+  });
 
-    const chartMap = {};
+  const chartMap = {};
 
-    for (let i = 0; i < days; i++) {
-      const date = new Date();
+  for (let i = 0; i < days; i++) {
+    const date = new Date();
 
-      date.setDate(
-        today.getDate() -
-          ((days - 1) - i)
-      );
+    date.setDate(today.getDate() - (days - 1 - i));
 
-      const label =
-        date.toLocaleDateString(
-          "en-US",
-          {
-            month: "short",
-            day: "numeric",
-          }
-        );
-
-      chartMap[label] = {
-        revenue: 0,
-        orders: 0,
-      };
-    }
-
-    orders.forEach((order) => {
-      const label =
-        order.createdAt.toLocaleDateString(
-          "en-US",
-          {
-            month: "short",
-            day: "numeric",
-          }
-        );
-
-      if (chartMap[label]) {
-        chartMap[label].revenue +=
-          order.total;
-
-        chartMap[label].orders += 1;
-      }
+    const label = date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     });
 
-    const revenueTrend =
-      Object.entries(chartMap).map(
-        ([label, value]) => ({
-          label,
-          revenue: value.revenue,
-        })
-      );
-
-    const ordersTrend =
-      Object.entries(chartMap).map(
-        ([label, value]) => ({
-          label,
-          orders: value.orders,
-        })
-      );
-
-    return {
-      revenueTrend,
-      ordersTrend,
+    chartMap[label] = {
+      revenue: 0,
+      orders: 0,
     };
+  }
+
+  orders.forEach((order) => {
+    const label = order.createdAt.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+
+    if (chartMap[label]) {
+      chartMap[label].revenue += order.total;
+
+      chartMap[label].orders += 1;
+    }
+  });
+
+  const revenueTrend = Object.entries(chartMap).map(([label, value]) => ({
+    day: label,
+    revenue: value.revenue,
+  }));
+
+  const ordersTrend = Object.entries(chartMap).map(([label, value]) => ({
+    day: label,
+    orders: value.orders,
+  }));
+
+  return {
+    revenueTrend,
+    ordersTrend,
   };
+};

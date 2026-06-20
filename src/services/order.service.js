@@ -1,11 +1,12 @@
 import prisma from "../prisma/prismaClient.js";
+import ApiError from "../utils/ApiError.js";
 
 export const createOrderService = async ({
   tableId,
   notes,
   items,
   customerName,
-  customerMobile
+  customerMobile,
 }) => {
   // Get dishes from DB
   const dishes = await prisma.dish.findMany({
@@ -24,9 +25,7 @@ export const createOrderService = async ({
   let total = 0;
 
   items.forEach((item) => {
-    const dish = dishes.find(
-      (dish) => dish.id === item.dishId
-    );
+    const dish = dishes.find((dish) => dish.id === item.dishId);
 
     total += dish.price * item.quantity;
   });
@@ -41,9 +40,7 @@ export const createOrderService = async ({
       customerMobile,
       items: {
         create: items.map((item) => {
-          const dish = dishes.find(
-            (dish) => dish.id === item.dishId
-          );
+          const dish = dishes.find((dish) => dish.id === item.dishId);
 
           return {
             dishId: item.dishId,
@@ -98,10 +95,48 @@ export const getOrderByIdService = async (id) => {
   });
 };
 
-export const updateOrderStatusService = async (
-  id,
-  status
-) => {
+// export const updateOrderStatusService = async (
+//   id,
+//   status
+// ) => {
+//   return await prisma.order.update({
+//     where: {
+//       id: Number(id),
+//     },
+//     data: {
+//       status,
+//     },
+//   });
+// };
+
+export const updateOrderStatusService = async (id, status) => {
+  const order = await prisma.order.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  const validTransitions = {
+    PENDING: ["PREPARING"],
+    PREPARING: ["READY"],
+    READY: ["DELIVERED"],
+    DELIVERED: [],
+    CANCELLED: [],
+  };
+
+  const allowedStatuses = validTransitions[order.status];
+
+  if (!allowedStatuses.includes(status)) {
+    throw new ApiError(
+      400,
+      `Cannot change status from ${order.status} to ${status}`,
+    );
+  }
+
   return await prisma.order.update({
     where: {
       id: Number(id),
@@ -110,4 +145,66 @@ export const updateOrderStatusService = async (
       status,
     },
   });
+};
+
+export const getOrderStatsService = async () => {
+  const today = new Date();
+
+  const startOfToday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+
+  const totalOrders = await prisma.order.count({
+    where: {
+      createdAt: {
+        gte: startOfToday,
+      },
+    },
+  });
+
+  const pendingOrders = await prisma.order.count({
+    where: {
+      status: "PENDING",
+      createdAt: {
+        gte: startOfToday,
+      },
+    },
+  });
+
+  const preparingOrders = await prisma.order.count({
+    where: {
+      status: "PREPARING",
+      createdAt: {
+        gte: startOfToday,
+      },
+    },
+  });
+
+  const readyOrders = await prisma.order.count({
+    where: {
+      status: "READY",
+      createdAt: {
+        gte: startOfToday,
+      },
+    },
+  });
+
+  const deliveredOrders = await prisma.order.count({
+    where: {
+      status: "DELIVERED",
+      createdAt: {
+        gte: startOfToday,
+      },
+    },
+  });
+
+  return {
+    totalOrders,
+    pendingOrders,
+    preparingOrders,
+    readyOrders,
+    deliveredOrders,
+  };
 };

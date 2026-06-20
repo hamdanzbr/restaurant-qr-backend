@@ -3,6 +3,7 @@ import {
   deleteCategoryService,
   getCategoriesService,
   getCategoryByIdService,
+  getCategoryStatsService,
   updateCategoryService,
 } from "../services/category.service.js";
 import { getRecentOrdersService } from "../services/dashboard.service.js";
@@ -88,3 +89,14 @@ export const getRecentOrders =asyncHandler(async(req,res)=>{
     });
 
 })
+
+export const getCategoryStats =
+  asyncHandler(async (req, res) => {
+    const data =
+      await getCategoryStatsService();
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });
