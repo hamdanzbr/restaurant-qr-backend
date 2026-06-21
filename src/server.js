@@ -7,6 +7,7 @@ import orderRoutes from "./routes/order.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
+import uploadRoutes from "./routes/upload.routes.js"
 import { errorHandler } from "./middleware/error.middleware.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -30,6 +31,9 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/analytics", analyticsRoutes);
+
+app.use("/api/upload", uploadRoutes);
+
 
 app.use(errorHandler);
 
