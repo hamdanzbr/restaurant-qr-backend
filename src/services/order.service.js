@@ -1,6 +1,6 @@
 import prisma from "../prisma/prismaClient.js";
 import ApiError from "../utils/ApiError.js";
-
+import { getIO } from "../socket/socket.js";
 export const createOrderService = async ({
   tableId,
   notes,
@@ -61,6 +61,13 @@ export const createOrderService = async ({
     },
   });
 
+  const io = getIO();
+
+  io.emit("order:created", {
+    id: order.id,
+    status: order.status,
+  });
+  
   return order;
 };
 export const getOrdersService = async () => {
@@ -137,7 +144,7 @@ export const updateOrderStatusService = async (id, status) => {
     );
   }
 
-  return await prisma.order.update({
+  const updateOrder = await prisma.order.update({
     where: {
       id: Number(id),
     },
@@ -145,6 +152,13 @@ export const updateOrderStatusService = async (id, status) => {
       status,
     },
   });
+  const io = getIO();
+
+  io.emit("order:updated", {
+    id: updateOrder.id,
+    status: updateOrder.status,
+  });
+  return updateOrder;
 };
 
 export const getOrderStatsService = async () => {
