@@ -4,11 +4,12 @@ import {
   getAnalyticsCharts,
   getAnalyticsOverview,
 } from "../controllers/analytics.controller.js";
+import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/overview", getAnalyticsOverview);
+router.get("/overview",authenticate, getAnalyticsOverview);
 
-router.get("/charts", getAnalyticsCharts);
+router.get("/charts",authenticate, getAnalyticsCharts);
 
 export default router;

@@ -117,3 +117,33 @@ export const deleteDishService = async (id) => {
     },
   });
 };
+
+export const getDishStatsService =
+  async () => {
+    const totalDishes =
+      await prisma.dish.count();
+
+    const availableDishes =
+      await prisma.dish.count({
+        where: {
+          available: true,
+        },
+      });
+
+    const outOfStockDishes =
+      await prisma.dish.count({
+        where: {
+          available: false,
+        },
+      });
+
+    const totalCategories =
+      await prisma.category.count();
+
+    return {
+      totalDishes,
+      availableDishes,
+      outOfStockDishes,
+      totalCategories,
+    };
+  };

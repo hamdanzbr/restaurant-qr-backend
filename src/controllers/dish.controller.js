@@ -3,6 +3,7 @@ import {
   deleteDishService,
   getDishByIdService,
   getDishesService,
+  getDishStatsService,
   updateDishService,
 } from "../services/dish.service.js";
 import ApiError from "../utils/ApiError.js";
@@ -95,3 +96,14 @@ export const deleteDish = asyncHandler(async (req, res) => {
     message: "Dish deleted successfully",
   });
 });
+
+export const getDishStats =
+  asyncHandler(async (req, res) => {
+    const data =
+      await getDishStatsService();
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });

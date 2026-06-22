@@ -7,17 +7,18 @@ import {
   getRevenueChart,
 } from "../controllers/dashboard.controller.js";
 import { getRecentOrders } from "../controllers/category.controller.js";
+import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/summary", getDashboardSummary);
+router.get("/summary",authenticate, getDashboardSummary);
 
-router.get("/revenue-chart", getRevenueChart);
+router.get("/revenue-chart",authenticate, getRevenueChart);
 
-router.get("/orders-overview", getOrdersOverview);
+router.get("/orders-overview",authenticate, getOrdersOverview);
 
-router.get("/popular-dishes", getPopularDishes);
+router.get("/popular-dishes",authenticate, getPopularDishes);
 
-router.get("/recent-orders", getRecentOrders);
+router.get("/recent-orders",authenticate, getRecentOrders);
 
 export default router;
